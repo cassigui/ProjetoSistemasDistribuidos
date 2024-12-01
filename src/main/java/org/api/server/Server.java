@@ -2,8 +2,10 @@ package org.api.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.api.database.DatabaseConnection;
-import org.api.model.Message;
+import org.api.entities.Message;
+import org.api.methodsClients.LoginClient;
+import org.api.methodsClients.RegisterClient;
+import org.api.utils.StatusResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,8 +13,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class Server extends Thread {
@@ -65,22 +65,59 @@ public class Server extends Thread {
             BufferedReader bf = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
             String inputLine;
+            String response = "";
 
             while ((inputLine = bf.readLine()) != null) {
                 System.out.println("Server: " + inputLine);
-                out.println(inputLine);
-            }
 
+                try {
+                    Message message = objectMapper.readValue(inputLine, Message.class);
+
+                    String operation = message.getOperation();
+                    String name = message.getName();
+                    String ra = message.getRa();
+                    String password = message.getPassword();
+
+                    if (operation.equalsIgnoreCase("login")) {
+                        if (LoginClient.login(ra, password).equalsIgnoreCase("success")) {
+                            out.println(StatusResponse.status200(operation, ra));
+                        } else if (LoginClient.login(ra, password).equalsIgnoreCase("connectionbd")) {
+                            out.println(StatusResponse.status401(operation, "connectionbd"));
+                        }else if (LoginClient.login(ra, password).equalsIgnoreCase("jsonread")) {
+                            out.println(StatusResponse.status401(operation, "jsonread"));
+                        } else if (LoginClient.login(ra, password).equalsIgnoreCase("invalid")) {
+                            out.println(StatusResponse.status401(operation, "invalid"));
+                        } else if (LoginClient.login(ra, password).equalsIgnoreCase("credential")) {
+                            out.println(StatusResponse.status401(operation, "credential"));
+                        }
+                    } else if (operation.equalsIgnoreCase("Register")) {
+                        if (RegisterClient.register(name, ra, password)) {
+                            out.println(StatusResponse.status200(operation, ra));
+                        } else {
+                            out.println(StatusResponse.status401(operation, "credential"));
+                        }
+                    } else {
+                        out.println(StatusResponse.status401(operation, "invalid"));
+                    }
+
+                } catch (JsonProcessingException | SQLException e) {
+                    System.out.println("Server" + "Erro ao processar JSON recebido: " + e.getMessage());
+
+                    response = String.format(
+                            "{\"operation\":\"%s\",\"status\":\"%s\",\"ra\":\"%s\"}",
+                            "401", "Não foi possível ler o JSON recebido."
+                    );
+                    out.println(response);
+                }
+            }
             System.out.println("Usuário desconectou.");
             out.close();
             bf.close();
             clientSocket.close();
 
         } catch (IOException io) {
-            // Mensagem para desconexões inesperadas
             System.out.println("Conexão com o cliente perdida.");
         } finally {
-            // Fechamento seguro do socket
             try {
                 if (!clientSocket.isClosed()) {
                     clientSocket.close();
@@ -91,4 +128,5 @@ public class Server extends Thread {
             }
         }
     }
+
 }

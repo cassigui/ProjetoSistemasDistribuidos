@@ -1,6 +1,6 @@
 package testes;
 
-import org.api.model.Message;
+//import org.api.model.Message;
 
 import org.api.database.DatabaseConnection;
 import org.api.server.Server;
@@ -18,7 +18,7 @@ public class DatabaseTest {
             System.err.println("Falha ao conectar ao banco de dados: " + e.getMessage());
         }
 
-        Message testMessage = new Message("info", "Teste de mensagem no banco de dados");
+//        Message testMessage = new Message("info", "Teste de mensagem no banco de dados");
 
     }
 }

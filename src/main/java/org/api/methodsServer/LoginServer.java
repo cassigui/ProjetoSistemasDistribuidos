@@ -15,40 +15,40 @@ import java.util.List;
 
 public class LoginServer {
 
-    public static boolean login(String userJSON) throws SQLException {
-        User user;
-        boolean logged = false;
+    public static String login(String userJSON) throws SQLException {
+        User user = null;
         Connection connection;
-        UserDAO userDAO;
+        UserDAO userDAO = null;
         User loggedUser;
+        String response = "";
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             user = objectMapper.readValue(userJSON, User.class);
         } catch (JsonProcessingException e) {
-            System.out.println("Erro ao processar o JSON: " + e.getMessage());
-            StatusResponse.status401("jsonconvert");
-            return false;
+            System.out.println("Server: " + "Erro ao processar o JSON: " + e.getMessage());
+            return "json";
         }
 
         try {
             connection = DatabaseConnection.getConnection();
             userDAO = new UserDAO(connection);
         } catch (SQLException e) {
-            System.out.println("Erro ao conectar ao banco de dados: " + e.getMessage());
-            StatusResponse.status401("conectionbd");
-            return false;
+            System.out.println("Server: " + "Erro ao conectar ao banco de dados: " + e.getMessage());
+            return "connectionbd";
         }
 
-        loggedUser = userDAO.getUserLogin(user.getRa(), user.getPassword());
+        loggedUser = userDAO != null ? userDAO.getUserLogin(
+                user != null ? user.getRa() : null, user != null ? user.getPassword() : null) : null;
 
         if (loggedUser != null) {
-//            userDAO.logged(loggedUser.getRa(), true);
-            MenuLogged.menuLogged(loggedUser.getName());
+            response = "success";
+            System.out.println("Server: " + loggedUser.getName() + " Logado");
         } else {
-            StatusResponse.status401("credential");
+            System.out.println("Server: " + " credenciais inválidas.");
+            response = "credencial";
         }
 
-        return logged;
+        return response;
     }
 }

@@ -1,16 +1,13 @@
 package org.api.client;
 
-import org.api.entities.User;
-import org.api.methodsClients.LoginClient;
 import org.api.methodsClients.LogoutClient;
-import org.api.methodsClients.Register;
+import org.api.methodsClients.RegisterClient;
 import org.api.utils.Menu;
 import org.api.utils.StatusResponse;
 
 import java.io.*;
 import java.net.*;
 import java.sql.SQLException;
-import java.util.InputMismatchException;
 
 public class Client {
     public static void main(String[] args) throws IOException, SQLException {
@@ -18,6 +15,7 @@ public class Client {
         String name = "";
         String ra = "";
         String password = "";
+        String operation = "";
 
         System.out.print("Digite o IP do servidor:");
         BufferedReader bfIP = new BufferedReader(new InputStreamReader(System.in));
@@ -80,7 +78,22 @@ public class Client {
                     System.out.print("Digite a sua senha: ");
                     password = reader.readLine();
 
-                    LoginClient.login(ra, password);
+                    operation = "login";
+
+                    String userJSON = String.format(
+                            "{\"operation\":\"%s\",\"ra\":\"%s\",\"password\":\"%s\"}",
+                            operation, ra, password
+                    );
+
+                    out.println(userJSON);
+                    out.flush();
+
+                    String serverResponse = in.readLine();
+                    if (serverResponse != null) {
+                        System.out.println("Resposta do servidor: " + serverResponse);
+                    } else {
+                        System.out.println("Nenhuma resposta recebida do servidor.");
+                    }
 
                 } catch (IOException e) {
                     System.out.println("Erro ao processar a entrada do usuário: " + e.getMessage());
@@ -88,41 +101,44 @@ public class Client {
             }
 
 
-//            if (userInput.equals("2")) {
-//
-//                out.println(" O usuário esta fazendo o cadastro...");
-//                User user = new User();
-//
-//                System.out.println("\n|- Sistema de Cadastro -|");
-//                try {
-//                    System.out.print("Digite o seu nome:");
-//                    BufferedReader bfName = new BufferedReader(new InputStreamReader(System.in));
-//                    name = bfName.readLine();
-//                    user.setNome(name);
-//
-//                    System.out.print("Digite seu RA:");
-//                    BufferedReader bfUser = new BufferedReader(new InputStreamReader(System.in));
-//                    ra = bfUser.readLine();
-//                    user.setRa(ra);
-//
-//                    System.out.print("Digite a sua senha:");
-//                    BufferedReader bfPassword = new BufferedReader(new InputStreamReader(System.in));
-//                    password = bfPassword.readLine();
-//                    user.setSenha(password);
-//
-//                } catch (InputMismatchException | NumberFormatException e) {
-//                    System.out.print("\nCliente:");
-//                    StatusResponse.status401("invalid");
-//                }
-//
-//                if (Register.register(user)) {
-//                    out.println("Usuário:" + user.getRa() + ", Cadastrado com Sucesso!");
-//                } else {
-//                    StatusResponse.status401("invalid");
-//                    out.println("Não foi possível cadastrar o usuário");
-//                }
-//                Menu.menu();
-//            }
+            if (userInput.equals("2")) {
+                System.out.println("\n|- Sistema de Cadastro -|");
+                try {
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+                    System.out.print("Digite o seu nome: ");
+                    name = reader.readLine();
+
+                    System.out.print("Digite seu RA: ");
+                    ra = reader.readLine();
+
+                    System.out.print("Digite a sua senha: ");
+                    password = reader.readLine();
+
+                    operation = "Register";
+                    String userJSON = String.format(
+                            "{\"operation\":\"%s\",\"name\":\"%s\",\"ra\":\"%s\",\"password\":\"%s\"}",
+                            operation, name, ra, password
+                    );
+
+                    out.println(userJSON);
+                    out.flush();
+
+                    String serverResponse = in.readLine();
+                    if (serverResponse != null) {
+                        System.out.println("Resposta do servidor: " + serverResponse);
+                    } else {
+                        System.out.println("Nenhuma resposta recebida do servidor.");
+                    }
+                } catch (IOException e) {
+                    System.err.println("Erro de entrada/saída: " + e.getMessage());
+                } catch (Exception e) {
+                    System.err.println("Ocorreu um erro inesperado: " + e.getMessage());
+                }
+
+                Menu.menu();
+            }
 
             if (userInput.equals("3")) {
                 LogoutClient.logout(ra);

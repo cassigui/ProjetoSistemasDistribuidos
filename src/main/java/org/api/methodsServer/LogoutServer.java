@@ -23,7 +23,7 @@ public class LogoutServer {
             user = objectMapper.readValue(raJSON, User.class);
         } catch (JsonProcessingException e) {
             System.out.println("Erro ao processar o JSON: " + e.getMessage());
-            StatusResponse.status401("jsonconvert");
+//            StatusResponse.status401("jsonconvert");
         }
 
         try {
@@ -31,16 +31,11 @@ public class LogoutServer {
             userDAO = new UserDAO(connection);
         } catch (SQLException e) {
             System.out.println("Erro ao conectar ao banco de dados: " + e.getMessage());
-            StatusResponse.status401("conectionbd");
+//            StatusResponse.status401("conectionbd");
         }
 
-//        try {
-//            userDAO.logged(user.getRa(),false);
             System.out.println(user.getRa()+ ", saiu");
             System.out.println("\nUsuário desconectado.\n");
             Menu.menu();
-//        }catch (SQLException e){
-//            System.out.println("Não foi possível realizar o logout");
-//        }
     }
 }

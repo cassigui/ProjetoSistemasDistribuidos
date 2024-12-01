@@ -1,29 +1,49 @@
 package org.api.utils;
 
 public class StatusResponse {
-    public static void status200() {
-        System.out.println("\nSucesso | Status: " + 200);
+    public static String status200(String operation, String ra) {
+        String responseJSON = "";
+        responseJSON = String.format(
+                "{\"operation\":\"%s\",\"status\":\"%s\",\"ra\":\"%s\"}",
+                operation, "200", ra
+        );
+        return responseJSON;
     }
 
-    public static void status401(String response) {
+    public static String status401(String operation, String response) {
+        String responseJSON = "";
         switch (response.toLowerCase()) {
             case "jsonread":
-                System.out.println("\nNão foi possível realizar a leitura do JSON. | Status: " + 401 + "\n");
+                responseJSON = String.format(
+                        "{\"status\":\"%s\",\"operation\":\"%s\",\"message\":\"%s\"}",
+                        "401", operation, "Não foi possível ler o json recebido."
+                );
                 break;
             case "jsonconvert":
-                System.out.println("\nNão foi possível converter os dados para JSON. | Status: " + 401 + "\n");
+                responseJSON = String.format(
+                        "{\"status\":\"%s\",\"operation\":\"%s\",\"message\":\"%s\"}",
+                        "401", operation, "Não foi possível converter os dados para JSON.."
+                );
                 break;
             case "invalid":
-                System.out.println("\nOs campos recebidos não são válidos. | Status: " + 401 + "\n");
+                responseJSON = String.format(
+                        "{\"status\":\"%s\",\"operation\":\"%s\",\"message\":\"%s\"}",
+                        "401", operation, "Os campos recebidos não são válidos."
+                );
                 break;
-            case "conectionbd":
-                System.out.println("\nO servidor nao conseguiu conectar com o banco de dados. | Status: " + 401 + "\n");
+            case "connectionbd":
+                responseJSON = String.format(
+                        "{\"status\":\"%s\",\"operation\":\"%s\",\"message\":\"%s\"}",
+                        "401", operation, "O servidor nao conseguiu conectar com o banco de dados"
+                );
                 break;
             case "credential":
-                System.out.println("\nCredenciais incorretas. | Status: " + 401 + "\n");
-                break;
+                responseJSON = String.format(
+                        "{\"status\":\"%s\",\"operation\":\"%s\",\"message\":\"%s\"}",
+                        "401", operation, "Credenciais incorretas"
+                );
         }
-
+        return responseJSON;
     }
 
 }
