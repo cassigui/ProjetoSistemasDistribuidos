@@ -13,34 +13,33 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.InputMismatchException;
 
 public class RegisterServer {
-    public static boolean register(String userJSON) throws JsonProcessingException, SQLException, InputMismatchException, NumberFormatException {
-        UserDAO userDAO;
+    public static String register(String userJSON) throws JsonProcessingException, SQLException, InputMismatchException, NumberFormatException {
+        UserDAO userDAO = null;
         User user;
+        String response = "";
 
         try {
             Connection connection = DatabaseConnection.getConnection();
             userDAO = new UserDAO(connection);
 
         } catch (SQLException e) {
-//            System.out.println(StatusResponse.status401("conectionbd"));
-            return false;
+            System.out.println("Server: " + "Erro ao conectar ao banco de dados: " + e.getMessage());
+            return "conectionbd";
         }
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             user = objectMapper.readValue(userJSON, User.class);
-            userDAO.saveUser(user);
-            return true;
         } catch (JsonProcessingException e) {
-            System.out.println("\nNão foi possível converter o JSON para OBJECT" + "\n");
-            return false;
-        } catch (InputMismatchException | NumberFormatException e) {
-//            System.out.println(StatusResponse.status401("invalid"));
-            return false;
-        } catch (SQLIntegrityConstraintViolationException e) {
-            System.out.print("Banco de dados: ");
-//            System.out.println(StatusResponse.status401("invalid"));
-            return false;
+            System.out.println("Server: " + "Erro ao processar o JSON: " + e.getMessage());
+            return "json";
+        }
+
+        try {
+            userDAO.saveUser(user);
+            return "success";
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
     }

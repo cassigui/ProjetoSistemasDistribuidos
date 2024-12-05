@@ -10,15 +10,15 @@ import java.sql.SQLException;
 
 public class LoginClient {
 
-    public static String login(String ra, String password) throws SQLException {
+    public static String login(String ra, String senha) throws SQLException {
         String response = "";
         String userJSON = "";
 
-        if ((ra.length() == 7 && ra.matches("\\d{7}")) && (password.length() >= 8 && password.length() <= 20 && password.matches("[a-zA-Z]{8,20}"))) {
+        if ((ra.length() == 7 && ra.matches("\\d{7}")) && (senha.length() >= 8 && senha.length() <= 20 && senha.matches("[a-zA-Z]{8,20}"))) {
             try {
-                userJSON = String.format("{\"ra\":%s,\"password\":\"%s\"}", ra, password);
+                userJSON = String.format("{\"ra\":%s,\"senha\":\"%s\"}", ra, senha);
             } catch (JSException e) {
-                response = "jsonread";
+                return  "jsonread";
             }
             if (LoginServer.login(userJSON).equalsIgnoreCase("success")) {
                 response = "success";

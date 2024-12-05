@@ -1,6 +1,8 @@
 package org.api.methodsClients;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import netscape.javascript.JSException;
+import org.api.methodsServer.LoginServer;
 import org.api.methodsServer.RegisterServer;
 import org.api.utils.StatusResponse;
 
@@ -9,24 +11,30 @@ import java.sql.SQLException;
 import static java.util.regex.Pattern.matches;
 
 public class RegisterClient {
-    public static boolean register(String name, String ra, String password) throws SQLException, JsonProcessingException {
-        Boolean register = false;
+    public static String register(String nome, String ra, String senha) throws SQLException, JsonProcessingException {
+        String response = "";
         String userJSON = "";
 
-        if (ra.length() == 7 && ra.matches("\\d{7}")) {
-            userJSON = String.format(
-                    "{\"name\":\"%s\",\"ra\":\"%s\",\"password\":\"%s\"}", name, ra, password);
-            if (RegisterServer.register(userJSON)) {
-                register = true;
-//                System.out.println("Server: " + StatusResponse.status200());
-                System.out.println("Server: " + userJSON + " Cadastrado com Sucesso");
-            }else {
-//                System.out.println("Server: " + StatusResponse.status401("credential"));
+        if ((ra.length() == 7 && ra.matches("\\d{7}")) && (senha.length() >= 8 && senha.length() <= 20 && senha.matches("[a-zA-Z]{8,20}"))) {
+            try {
+                userJSON = String.format(
+                        "{\"nome\":\"%s\",\"ra\":\"%s\",\"senha\":\"%s\"}", nome, ra, senha);
+            } catch (JSException e) {
+                return "jsonread";
+            }
+            if (RegisterServer.register(userJSON).equalsIgnoreCase("success")) {
+                response = "success";
+            } else if (RegisterServer.register(userJSON).equalsIgnoreCase("credential")) {
+                response = "credential";
+            } else if (RegisterServer.register(userJSON).equalsIgnoreCase("connectionbd")) {
+                response = "conectionbd";
             }
         } else {
-//            System.out.println("Server: " + StatusResponse.status401("invalid"));
+            response = "invalid";
         }
 
-        return register;
+        return response;
+
     }
+
 }

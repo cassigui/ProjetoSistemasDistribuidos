@@ -39,11 +39,11 @@ public class LoginServer {
         }
 
         loggedUser = userDAO != null ? userDAO.getUserLogin(
-                user != null ? user.getRa() : null, user != null ? user.getPassword() : null) : null;
+                user != null ? user.getRa() : null, user != null ? user.getSenha() : null) : null;
 
         if (loggedUser != null) {
             response = "success";
-            System.out.println("Server: " + loggedUser.getName() + " Logado");
+            System.out.println("Server: " + loggedUser.getNome() + " Logado");
         } else {
             System.out.println("Server: " + " credenciais inválidas.");
             response = "credencial";

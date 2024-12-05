@@ -73,38 +73,48 @@ public class Server extends Thread {
                 try {
                     Message message = objectMapper.readValue(inputLine, Message.class);
 
-                    String operation = message.getOperation();
-                    String name = message.getName();
+                    String operacao = message.getOperacao();
+                    String nome = message.getNome();
                     String ra = message.getRa();
-                    String password = message.getPassword();
+                    String senha = message.getSenha();
 
-                    if (operation.equalsIgnoreCase("login")) {
-                        if (LoginClient.login(ra, password).equalsIgnoreCase("success")) {
-                            out.println(StatusResponse.status200(operation, ra));
-                        } else if (LoginClient.login(ra, password).equalsIgnoreCase("connectionbd")) {
-                            out.println(StatusResponse.status401(operation, "connectionbd"));
-                        }else if (LoginClient.login(ra, password).equalsIgnoreCase("jsonread")) {
-                            out.println(StatusResponse.status401(operation, "jsonread"));
-                        } else if (LoginClient.login(ra, password).equalsIgnoreCase("invalid")) {
-                            out.println(StatusResponse.status401(operation, "invalid"));
-                        } else if (LoginClient.login(ra, password).equalsIgnoreCase("credential")) {
-                            out.println(StatusResponse.status401(operation, "credential"));
+                    if (operacao.equalsIgnoreCase("login")) {
+                        if (LoginClient.login(ra, senha).equalsIgnoreCase("success")) {
+                            out.println(StatusResponse.status200(operacao, ra));
+                        } else if (LoginClient.login(ra, senha).equalsIgnoreCase("connectionbd")) {
+                            out.println(StatusResponse.status401(operacao, "connectionbd"));
+                        } else if (LoginClient.login(ra, senha).equalsIgnoreCase("jsonread")) {
+                            out.println(StatusResponse.status401(operacao, "jsonread"));
+                        } else if (LoginClient.login(ra, senha).equalsIgnoreCase("invalid")) {
+                            out.println(StatusResponse.status401(operacao, "invalid"));
+                        } else if (LoginClient.login(ra, senha).equalsIgnoreCase("credential")) {
+                            out.println(StatusResponse.status401(operacao, "credential"));
                         }
-                    } else if (operation.equalsIgnoreCase("Register")) {
-                        if (RegisterClient.register(name, ra, password)) {
-                            out.println(StatusResponse.status200(operation, ra));
-                        } else {
-                            out.println(StatusResponse.status401(operation, "credential"));
+                    } else if (operacao.equalsIgnoreCase("cadastrarUsuario")) {
+                        if (RegisterClient.register(nome, ra, senha).equalsIgnoreCase("success")) {
+                            out.println(StatusResponse.status200(operacao, ra));
+                        } else if (RegisterClient.register(nome, ra, senha).equalsIgnoreCase("connectionbd")) {
+                            out.println(StatusResponse.status401(operacao, "connectionbd"));
+                        } else if (RegisterClient.register(nome, ra, senha).equalsIgnoreCase("jsonread")) {
+                            out.println(StatusResponse.status401(operacao, "jsonread"));
+                        } else if (RegisterClient.register(nome, ra, senha).equalsIgnoreCase("invalid")) {
+                            out.println(StatusResponse.status401(operacao, "invalid"));
+                        } else if (RegisterClient.register(nome, ra, senha).equalsIgnoreCase("credential")) {
+                            out.println(StatusResponse.status401(operacao, "credential"));
                         }
-                    } else {
-                        out.println(StatusResponse.status401(operation, "invalid"));
+                    } else if (operacao.equalsIgnoreCase("logout")){
+                        out.println("status:200");
+                        out.close();
+                        bf.close();
+                        clientSocket.close();
+                        break;
                     }
 
                 } catch (JsonProcessingException | SQLException e) {
                     System.out.println("Server" + "Erro ao processar JSON recebido: " + e.getMessage());
 
                     response = String.format(
-                            "{\"operation\":\"%s\",\"status\":\"%s\",\"ra\":\"%s\"}",
+                            "{\"operacao\":\"%s\",\"status\":\"%s\",\"ra\":\"%s\"}",
                             "401", "Não foi possível ler o JSON recebido."
                     );
                     out.println(response);

@@ -1,9 +1,6 @@
 package org.api.client;
 
-import org.api.methodsClients.LogoutClient;
-import org.api.methodsClients.RegisterClient;
 import org.api.utils.Menu;
-import org.api.utils.StatusResponse;
 
 import java.io.*;
 import java.net.*;
@@ -12,10 +9,10 @@ import java.sql.SQLException;
 public class Client {
     public static void main(String[] args) throws IOException, SQLException {
 
-        String name = "";
+        String nome = "";
         String ra = "";
-        String password = "";
-        String operation = "";
+        String senha = "";
+        String operacao = "";
 
         System.out.print("Digite o IP do servidor:");
         BufferedReader bfIP = new BufferedReader(new InputStreamReader(System.in));
@@ -30,15 +27,15 @@ public class Client {
         System.out.println("Tentando conectar ao IP " +
                 ip + " na porta " + port);
 
-        Socket echoSocket = null;
+        Socket serverSocket = null;
         PrintWriter out = null;
         BufferedReader in = null;
 
         try {
-            echoSocket = new Socket(ip, port);
-            out = new PrintWriter(echoSocket.getOutputStream(), true);
+            serverSocket = new Socket(ip, port);
+            out = new PrintWriter(serverSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(
-                    echoSocket.getInputStream()));
+                    serverSocket.getInputStream()));
         } catch (UnknownHostException e) {
             System.err.println("Não foi possível reconhecer o ip: " + ip);
             System.exit(1);
@@ -76,13 +73,13 @@ public class Client {
                     ra = reader.readLine();
 
                     System.out.print("Digite a sua senha: ");
-                    password = reader.readLine();
+                    senha = reader.readLine();
 
-                    operation = "login";
+                    operacao = "login";
 
                     String userJSON = String.format(
-                            "{\"operation\":\"%s\",\"ra\":\"%s\",\"password\":\"%s\"}",
-                            operation, ra, password
+                            "{\"operacao\":\"%s\",\"ra\":\"%s\",\"senha\":\"%s\"}",
+                            operacao, ra, senha
                     );
 
                     out.println(userJSON);
@@ -108,18 +105,18 @@ public class Client {
                     BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
                     System.out.print("Digite o seu nome: ");
-                    name = reader.readLine();
+                    nome = reader.readLine();
 
                     System.out.print("Digite seu RA: ");
                     ra = reader.readLine();
 
                     System.out.print("Digite a sua senha: ");
-                    password = reader.readLine();
+                    senha = reader.readLine();
 
-                    operation = "Register";
+                    operacao = "cadastrarUsuario";
                     String userJSON = String.format(
-                            "{\"operation\":\"%s\",\"name\":\"%s\",\"ra\":\"%s\",\"password\":\"%s\"}",
-                            operation, name, ra, password
+                            "{\"operacao\":\"%s\",\"nome\":\"%s\",\"ra\":\"%s\",\"senha\":\"%s\"}",
+                            operacao, nome, ra, senha
                     );
 
                     out.println(userJSON);
@@ -141,7 +138,21 @@ public class Client {
             }
 
             if (userInput.equals("3")) {
-                LogoutClient.logout(ra);
+
+                operacao = "logout";
+                String userJSON = String.format(
+                        "{\"operacao\":\"%s\",\"ra\":\"%s\"}",
+                        operacao, ra
+                );
+
+                out.println(userJSON);
+
+                bfIP.close();
+                out.close();
+                in.close();
+                stdIn.close();
+                serverSocket.close();
+                bfPort.close();
             }
         }
 
@@ -150,6 +161,6 @@ public class Client {
         out.close();
         in.close();
         stdIn.close();
-        echoSocket.close();
+        serverSocket.close();
     }
 }

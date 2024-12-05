@@ -1,14 +1,9 @@
 package org.api.entities;
 
 public class User {
-    private String name;
+    private String nome;
     private String ra;
-    private String password;
-    private Boolean logged = false;
-
-    public User(){
-
-    }
+    private String senha;
 
     // Getters e Setters
     public String getRa() {
@@ -19,28 +14,21 @@ public class User {
         this.ra = ra;
     }
 
-    public String getName() {
-        return name;
+    public String getNome() {
+        return nome;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
-    public String getPassword() {
-        return password;
+    public String getSenha() {
+        return senha;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setSenha(String senha) {
+        this.senha = senha;
     }
 
-    public Boolean getLogged() {
-        return logged;
-    }
-
-    public void setLogged(Boolean logged) {
-        this.logged = logged;
-    }
 
 }
