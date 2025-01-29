@@ -2,9 +2,21 @@ package org.api.entities;
 
 public class Message {
     private String operacao;
+    private String token;
     private String nome;
     private String ra;
     private String senha;
+    private int id;
+    private Integer status;
+    private User usuario;
+
+    public User getUsuario() {
+        return usuario;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
 
     public String getOperacao() {
         return operacao;
@@ -37,6 +49,18 @@ public class Message {
     public void setSenha(String senha) {
         this.senha = senha;
     }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public int getId() { return id; }
+
+    public void setId(int id) { this.id = id; }
 }
 
 

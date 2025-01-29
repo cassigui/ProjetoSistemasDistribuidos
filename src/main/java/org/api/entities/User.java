@@ -1,9 +1,9 @@
 package org.api.entities;
 
 public class User {
-    private String nome;
     private String ra;
     private String senha;
+    private String nome;
 
     // Getters e Setters
     public String getRa() {
@@ -30,5 +30,11 @@ public class User {
         this.senha = senha;
     }
 
-
+    public String toString() {
+        return "User{" +
+                ", ra='" + ra + '\'' +
+                ", senha='" + senha + '\'' +
+                "nome='" + nome + '\'' +
+                '}';
+    }
 }

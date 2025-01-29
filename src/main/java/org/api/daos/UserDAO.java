@@ -13,43 +13,37 @@ public class UserDAO {
         this.connection = connection;
     }
 
-    public void saveUser(User user) throws SQLException {
-        String sql = "INSERT INTO users (nome, ra, senha) VALUES (?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, user.getNome());
-            stmt.setString(2, user.getRa());
-            stmt.setString(3, user.getSenha());
-            stmt.executeUpdate();
+    public boolean saveUser(User user) throws SQLException {
+        User userExist = getUserLogin(user.getRa());
+        if (userExist != null) {
+            System.out.println("Usuário encontrado: " + userExist);
+            return false;
+        } else {
+            String sql = "INSERT INTO users (nome, ra, senha) VALUES (?, ?, ?)";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, user.getNome());
+                stmt.setString(2, user.getRa());
+                stmt.setString(3, user.getSenha());
+                stmt.executeUpdate();
+                System.out.println("Server: Usuário cadastrado : " + user);
+            }
+            return true;
         }
     }
 
-//    public Boolean isLogged(String ra) throws SQLException {
-//        String sql = "SELECT logged FROM users WHERE ra = ?";
-//        Boolean logged = null;
-//
-//        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-//            stmt.setString(1, ra);
-//            try (ResultSet rs = stmt.executeQuery()) {
-//                if (rs.next()) {
-//                    logged = rs.getBoolean("logged");
-//                }
-//            }
-//        }
-//
-//        return logged;
-//    }
-
-//    public void logged(String ra, Boolean logged) throws SQLException {
-//        String sql = "UPDATE users SET logged = ? WHERE ra = ?";
-//        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-//            stmt.setBoolean(1, logged);
-//            stmt.setString(2, ra);
-//            stmt.executeUpdate();
-//        }
-//    }
+    public boolean updateUser(User user) throws SQLException {
+        String sql = "UPDATE users SET nome = ?, senha = ? WHERE ra = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, user.getNome());
+            stmt.setString(2, user.getSenha());
+            stmt.setString(3, user.getRa());
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        }
+    }
 
     public List<User> getUsers() throws SQLException {
-        List<User> users = new ArrayList<User>();
+        List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM users";
 
         try (Statement stmt = connection.createStatement();
@@ -65,24 +59,32 @@ public class UserDAO {
         return users;
     }
 
-    public User getUserLogin(String ra, String senha) throws SQLException {
-        String sql = "SELECT * FROM users WHERE ra = ? AND senha = ?";
-        User user = null;
+    public User getUserLogin(String ra) throws SQLException {
+        String sql = "SELECT * FROM users WHERE ra = ?";
+        User userExist = null;
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, ra);
-            stmt.setString(2, senha);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    user = new User();
-                    user.setNome(rs.getString("nome"));
-                    user.setRa(rs.getString("ra"));
-                    user.setSenha(rs.getString("senha"));
+                    userExist = new User();
+                    userExist.setNome(rs.getString("nome"));
+                    userExist.setRa(rs.getString("ra"));
+                    userExist.setSenha(rs.getString("senha"));
                 }
             }
         }
 
-        return user;
+        return userExist;
     }
 
+    public boolean deleteUser(String ra) throws SQLException {
+        String sql = "DELETE FROM users WHERE ra = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, ra);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        }
+    }
 }

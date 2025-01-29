@@ -1,6 +1,11 @@
 package org.api.client;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.api.entities.Message;
 import org.api.utils.Menu;
+import org.api.utils.MenuLogged;
+import org.api.utils.StatusResponse;
 
 import java.io.*;
 import java.net.*;
@@ -11,6 +16,8 @@ public class Client {
 
         String nome = "";
         String ra = "";
+        Integer id = 0;
+        String token = "";
         String senha = "";
         String operacao = "";
 
@@ -86,8 +93,18 @@ public class Client {
                     out.flush();
 
                     String serverResponse = in.readLine();
+
+                    ObjectMapper mapper = new ObjectMapper();
+                    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                    Message message = mapper.readValue(serverResponse, Message.class);
+
+                    Integer status = message.getStatus();
+
                     if (serverResponse != null) {
                         System.out.println("Resposta do servidor: " + serverResponse);
+                        if (status.equals(200)) {
+                            MenuLogged.menu(ra);
+                        }
                     } else {
                         System.out.println("Nenhuma resposta recebida do servidor.");
                     }
@@ -95,8 +112,8 @@ public class Client {
                 } catch (IOException e) {
                     System.out.println("Erro ao processar a entrada do usuário: " + e.getMessage());
                 }
-            }
 
+            }
 
             if (userInput.equals("2")) {
                 System.out.println("\n|- Sistema de Cadastro -|");
@@ -128,6 +145,7 @@ public class Client {
                     } else {
                         System.out.println("Nenhuma resposta recebida do servidor.");
                     }
+
                 } catch (IOException e) {
                     System.err.println("Erro de entrada/saída: " + e.getMessage());
                 } catch (Exception e) {
@@ -135,6 +153,245 @@ public class Client {
                 }
 
                 Menu.menu();
+            }
+            if (userInput.equals("4")) {
+                System.out.println("\n|- Sistema de Atualização -|");
+                try {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+                    operacao = "editarUsuario";
+
+                    token = ra;
+
+                    System.out.print("Digite o RA do Usuário: ");
+                    ra = reader.readLine();
+
+                    System.out.print("Digite a nova senha: ");
+                    senha = reader.readLine();
+
+                    System.out.print("Digite o novo nome do Usuário: ");
+                    nome = reader.readLine();
+
+                    String usuario = String.format(
+                            "{\"ra\":\"%s\",\"senha\":\"%s\",\"nome\":\"%s\"}",
+                            ra, senha, nome
+                    );
+
+                    String userJSON = String.format(
+                            "{\"operacao\":\"%s\",\"token\":\"%s\",\"usuario\":%s}",
+                            operacao, token, usuario
+                    );
+
+                    out.println(userJSON);
+                    out.flush();
+
+                    String serverResponse = in.readLine();
+                    if (serverResponse != null) {
+                        System.out.println("Resposta do servidor: " + serverResponse);
+                    } else {
+                        System.out.println("Nenhuma resposta recebida do servidor.");
+                    }
+
+                } catch (IOException e) {
+                    System.err.println("Erro de entrada/saída: " + e.getMessage());
+                } catch (Exception e) {
+                    System.err.println("Ocorreu um erro inesperado: " + e.getMessage());
+                }
+
+            }
+
+            if (userInput.equals("5")) {
+                System.out.println("\n|- Sistema de Exclusão de Usuário-|");
+                try {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+                    operacao = "excluirUsuario";
+
+                    token = ra;
+                    System.out.print("Digite o RA do Usuário: ");
+                    ra = reader.readLine();
+
+                    String userJSON = String.format(
+                            "{\"operacao\":\"%s\",\"token\":\"%s\",\"ra\":\"%s\"}",
+                            operacao, token, ra
+                    );
+
+                    out.println(userJSON);
+                    out.flush();
+
+                    String serverResponse = in.readLine();
+                    if (serverResponse != null) {
+                        System.out.println("Resposta do servidor: " + serverResponse);
+                    } else {
+                        System.out.println("Nenhuma resposta recebida do servidor.");
+                    }
+
+                } catch (IOException e) {
+                    System.err.println("Erro de entrada/saída: " + e.getMessage());
+                } catch (Exception e) {
+                    System.err.println("Ocorreu um erro inesperado: " + e.getMessage());
+                }
+
+            }
+
+            if (userInput.equals("6")) {
+                System.out.println("\n|- Listar Usuarios -|");
+                try {
+                    operacao = "listarUsuarios";
+
+                    token = ra;
+
+                    String userJSON = String.format(
+                            "{\"operacao\":\"%s\",\"token\":\"%s\"}",
+                            operacao, token
+                    );
+
+                    out.println(userJSON);
+                    out.flush();
+
+                    String serverResponse = in.readLine();
+                    if (serverResponse != null) {
+                        System.out.println("Resposta do servidor: " + serverResponse);
+                    } else {
+                        System.out.println("Nenhuma resposta recebida do servidor.");
+                    }
+
+                } catch (IOException e) {
+                    System.err.println("Erro de entrada/saída: " + e.getMessage());
+                } catch (Exception e) {
+                    System.err.println("Ocorreu um erro inesperado: " + e.getMessage());
+                }
+
+            }
+
+            if (userInput.equals("7")) {
+                System.out.println("\n|-Exibir dados do Usuario -|");
+                try {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+                    operacao = "localizarUsuario";
+                    token = ra;
+
+                    System.out.print("Digite o RA do Usuário: ");
+                    ra = reader.readLine();
+
+                    String userJSON = String.format(
+                            "{\"operacao\":\"%s\",\"token\":\"%s\",\"ra\":\"%s\"}",
+                            operacao, token, ra
+                    );
+
+                    out.println(userJSON);
+                    out.flush();
+
+                    String serverResponse = in.readLine();
+                    if (serverResponse != null) {
+                        System.out.println("Resposta do servidor: " + serverResponse);
+                    } else {
+                        System.out.println("Nenhuma resposta recebida do servidor.");
+                    }
+
+                } catch (IOException e) {
+                    System.err.println("Erro de entrada/saída: " + e.getMessage());
+                } catch (Exception e) {
+                    System.err.println("Ocorreu um erro inesperado: " + e.getMessage());
+                }
+
+            }
+
+            if (userInput.equals("8")) {
+                System.out.println("\n|- Cadastrar Categoria -|");
+                try {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+                    operacao = "salvarCategoria";
+                    token = ra;
+
+                    System.out.print("Digite o ID da categoria: ");
+                    id = Integer.valueOf(reader.readLine());
+
+                    System.out.print("Digite o nome da categoria: ");
+                    nome = reader.readLine();
+
+                    String categoryJSON = String.format(
+                            "{\"operacao\":\"%s\",\"token\":\"%s\",\"id\":\"%d\",\"nome\":\"%s\"}",
+                            operacao, token, id, nome
+                    );
+
+                    out.println(categoryJSON);
+                    out.flush();
+
+                    String serverResponse = in.readLine();
+                    if (serverResponse != null) {
+                        System.out.println("Resposta do servidor: " + serverResponse);
+                    } else {
+                        System.out.println("Nenhuma resposta recebida do servidor.");
+                    }
+
+                } catch (IOException e) {
+                    System.err.println("Erro de entrada/saída: " + e.getMessage());
+                } catch (Exception e) {
+                    System.err.println("Ocorreu um erro inesperado: " + e.getMessage());
+                }
+
+            }
+            if (userInput.equals("9")) {
+                System.out.println("\n|- Sistema de Exclusão de Categoria -|");
+                try {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+                    operacao = "excluirCategoria";
+                    token = ra;
+                    System.out.print("Digite o ID da categoria: ");
+                    id = Integer.valueOf(reader.readLine());
+
+                    String userJSON = String.format(
+                            "{\"operacao\":\"%s\",\"token\":\"%s\",\"id\":\"%d\"}",
+                            operacao, token, id
+                    );
+
+                    out.println(userJSON);
+                    out.flush();
+
+                    String serverResponse = in.readLine();
+                    if (serverResponse != null) {
+                        System.out.println("Resposta do servidor: " + serverResponse);
+                    } else {
+                        System.out.println("Nenhuma resposta recebida do servidor.");
+                    }
+
+                } catch (IOException e) {
+                    System.err.println("Erro de entrada/saída: " + e.getMessage());
+                } catch (Exception e) {
+                    System.err.println("Ocorreu um erro inesperado: " + e.getMessage());
+                }
+            }
+            if (userInput.equals("10")) {
+                System.out.println("\n|- Sistema de Listagem de Categoria -|");
+                try {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+                    operacao = "listarCategorias";
+                    token = ra;
+
+                    String userJSON = String.format(
+                            "{\"operacao\":\"%s\",\"token\":\"%s\"}",
+                            operacao, token
+                    );
+
+                    out.println(userJSON);
+                    out.flush();
+
+                    String serverResponse = in.readLine();
+                    if (serverResponse != null) {
+                        System.out.println("Resposta do servidor: " + serverResponse);
+                    } else {
+                        System.out.println("Nenhuma resposta recebida do servidor.");
+                    }
+
+                } catch (IOException e) {
+                    System.err.println("Erro de entrada/saída: " + e.getMessage());
+                } catch (Exception e) {
+                    System.err.println("Ocorreu um erro inesperado: " + e.getMessage());
+                }
+
             }
 
             if (userInput.equals("3")) {
@@ -147,20 +404,19 @@ public class Client {
 
                 out.println(userJSON);
 
-                bfIP.close();
-                out.close();
-                in.close();
-                stdIn.close();
-                serverSocket.close();
-                bfPort.close();
+                break;
             }
         }
+        try {
 
-        bfPort.close();
-        bfIP.close();
-        out.close();
-        in.close();
-        stdIn.close();
-        serverSocket.close();
+            bfPort.close();
+            bfIP.close();
+            out.close();
+            in.close();
+            stdIn.close();
+            serverSocket.close();
+        } catch (IOException e) {
+            System.err.println("Erro ao realizar o logout: " + e.getMessage());
+        }
     }
 }
