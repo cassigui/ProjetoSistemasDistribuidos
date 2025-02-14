@@ -24,9 +24,9 @@ public class Server extends Thread {
     protected Socket clientSocket;
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    String saveToken = null;
 
     public static void main(String[] args) throws SQLException, IOException {
-
         ServerSocket serverSocket = null;
 
         System.out.print("Digite a porta do Servidor:");
@@ -96,6 +96,7 @@ public class Server extends Thread {
                         if (loginResult.equalsIgnoreCase("success")) {
                             out.println(StatusResponse.status200(operacao, ra));
                             LoggedUsers.addUser(ra);
+                            this.saveToken = ra;
                         } else if (loginResult.equalsIgnoreCase("isLogged")) {
                             out.println(StatusResponse.status401(operacao, "isLogged"));
                         } else if (loginResult.equalsIgnoreCase("connectionbd")) {
@@ -173,7 +174,7 @@ public class Server extends Thread {
                         } else if (usersList.equalsIgnoreCase("unauthorized")) {
                             out.println(StatusResponse.unauthorized(operacao));
                         } else if (usersList.equalsIgnoreCase("nodata")) {
-                            out.println(StatusResponse.noData(operacao));
+                            out.println(StatusResponse.status401(operacao, "nodata"));
                         } else {
                             out.println(String.format(
                                     "{\"status\":201,\"operacao\":\"%s\",\"usuarios\":%s}",
@@ -188,15 +189,36 @@ public class Server extends Thread {
                             out.println(StatusResponse.status401(operacao, "connectionbd"));
                         } else if (user.equalsIgnoreCase("unauthorized")) {
                             out.println(StatusResponse.unauthorized(operacao));
+                        } else if (user.equalsIgnoreCase("usernotfound")) {
+                            out.println(StatusResponse.status401(operacao, "usernotfound"));
                         } else {
                             out.println(String.format(
-                                    "{\"status\":201,\"operacao\":\"%s\",\"usuario\":\"%s\"}",
-                                    operacao,
-                                    user
+                                    "{\"status\":201,\"operacao\":\"%s\",\"usuario\":%s}", // Remova as aspas ao redor de %s do usuario
+                                    operacao.replace("\"", "\\\""),
+                                    user // Insira diretamente, sem aspas
+                            ));
+                        }
+                    } else if (operacao.equalsIgnoreCase("localizarCategoria")) {
+                        String category = ListClientCategories.localizar(token, ra, id);
+
+                        if (category.equalsIgnoreCase("connectionbd")) {
+                            out.println(StatusResponse.status401(operacao, "connectionbd"));
+                        } else if (category.equalsIgnoreCase("unauthorized")) {
+                            out.println(StatusResponse.unauthorized(operacao));
+                        } else if (category.equalsIgnoreCase("categorynotfound")) {
+                            out.println(StatusResponse.status401(operacao, "categorynotfound"));
+                        } else {
+                            out.println(String.format(
+                                    "{\"status\":201,\"operacao\":\"%s\",\"categoria\":%s}", // Remova as aspas ao redor de %s do usuario
+                                    operacao.replace("\"", "\\\""),
+                                    category
                             ));
                         }
                     } else if (operacao.equalsIgnoreCase("salvarCategoria")) {
-                        String categoryResult = CreateClientCategories.createCategory(token, id, nome);
+                        String nomeCategoria = message.getCategoria().getNome();
+                        int idCategoria = message.getCategoria().getId();
+
+                        String categoryResult = CreateClientCategories.createCategory(token, idCategoria, nomeCategoria);
 
                         if (categoryResult.equalsIgnoreCase("connectionbd")) {
                             out.println(StatusResponse.status401(operacao, "connectionbd"));
@@ -227,7 +249,7 @@ public class Server extends Thread {
                         } else if (categoryList.equalsIgnoreCase("unauthorized")) {
                             out.println(StatusResponse.unauthorized(operacao));
                         } else if (categoryList.equalsIgnoreCase("nodata")) {
-                            out.println(StatusResponse.noData(operacao));
+                            out.println(StatusResponse.status401(operacao, "nodata"));
                         } else {
                             out.println(String.format(
                                     "{\"status\":201,\"operacao\":\"%s\",\"categorias\":%s}",
@@ -244,13 +266,14 @@ public class Server extends Thread {
                         }
 
                     } else if (operacao.equalsIgnoreCase("logout")) {
-                        if (LoggedUsers.desconectUser(ra)) {
-                            out.println(StatusResponse.status200Loggin());
+                        boolean resultLogout = LoggedUsers.disconnectUser(token);
+                        if (resultLogout) {
+                            System.out.println("usuario desconectado");
+                            out.println(StatusResponse.status200Loggout());
                         }
-                        out.close();
-                        bf.close();
-                        clientSocket.close();
-                        break;
+                    }
+                    else {
+                        out.println(StatusResponse.notFoundOperation(operacao));
                     }
 
                 } catch (JsonProcessingException | SQLException e) {
@@ -269,6 +292,7 @@ public class Server extends Thread {
             clientSocket.close();
 
         } catch (IOException io) {
+            LoggedUsers.disconnectUser(this.saveToken);
             System.out.println("Conexão com o cliente perdida.");
         } finally {
             try {

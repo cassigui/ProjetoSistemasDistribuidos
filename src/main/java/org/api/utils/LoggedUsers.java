@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LoggedUsers {
-    private static List<String> loggedUsers = new ArrayList<>();
+    private static final List<String> loggedUsers = new ArrayList<>();
 
     public static void addUser(String ra) {
         if (!isLogged(ra)) {
@@ -22,9 +22,9 @@ public class LoggedUsers {
         return loggedUsers.contains(ra);
     }
 
-    public static boolean desconectUser (String ra) {
-        if(isLogged(ra)) {
-            loggedUsers.remove(ra);
+    public static boolean disconnectUser (String token) {
+        if(isLogged(token)) {
+            loggedUsers.remove(token);
             return true;
         }else {
             return false;

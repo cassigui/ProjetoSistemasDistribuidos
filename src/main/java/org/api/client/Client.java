@@ -310,12 +310,17 @@ public class Client {
                     System.out.print("Digite o nome da categoria: ");
                     nome = reader.readLine();
 
-                    String categoryJSON = String.format(
-                            "{\"operacao\":\"%s\",\"token\":\"%s\",\"id\":\"%d\",\"nome\":\"%s\"}",
-                            operacao, token, id, nome
+                    String categoriaJSON = String.format(
+                            "{\"id\":%d,\"nome\":\"%s\"}",
+                            id, nome
                     );
 
-                    out.println(categoryJSON);
+                    String requestJSON = String.format(
+                            "{\"operacao\":\"%s\",\"token\":\"%s\",\"categoria\":%s}",
+                            operacao, token, categoriaJSON
+                    );
+
+                    out.println(requestJSON);
                     out.flush();
 
                     String serverResponse = in.readLine();
@@ -330,8 +335,8 @@ public class Client {
                 } catch (Exception e) {
                     System.err.println("Ocorreu um erro inesperado: " + e.getMessage());
                 }
-
             }
+
             if (userInput.equals("9")) {
                 System.out.println("\n|- Sistema de Exclusão de Categoria -|");
                 try {
@@ -342,12 +347,12 @@ public class Client {
                     System.out.print("Digite o ID da categoria: ");
                     id = Integer.valueOf(reader.readLine());
 
-                    String userJSON = String.format(
+                    String categoryJSON = String.format(
                             "{\"operacao\":\"%s\",\"token\":\"%s\",\"id\":\"%d\"}",
                             operacao, token, id
                     );
 
-                    out.println(userJSON);
+                    out.println(categoryJSON);
                     out.flush();
 
                     String serverResponse = in.readLine();
@@ -371,12 +376,44 @@ public class Client {
                     operacao = "listarCategorias";
                     token = ra;
 
-                    String userJSON = String.format(
+                    String categoryJSON = String.format(
                             "{\"operacao\":\"%s\",\"token\":\"%s\"}",
                             operacao, token
                     );
 
-                    out.println(userJSON);
+                    out.println(categoryJSON);
+                    out.flush();
+
+                    String serverResponse = in.readLine();
+                    if (serverResponse != null) {
+                        System.out.println("Resposta do servidor: " + serverResponse);
+                    } else {
+                        System.out.println("Nenhuma resposta recebida do servidor.");
+                    }
+
+                } catch (IOException e) {
+                    System.err.println("Erro de entrada/saída: " + e.getMessage());
+                } catch (Exception e) {
+                    System.err.println("Ocorreu um erro inesperado: " + e.getMessage());
+                }
+            }
+            if (userInput.equals("11")) {
+                System.out.println("\n|- Sistema de Localização de Categoria -|");
+                try {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+                    operacao = "localizarCategoria";
+                    token = ra;
+
+                    System.out.print("Digite o ID da categoria: ");
+                    id = Integer.valueOf(reader.readLine());
+
+                    String categoryJSON = String.format(
+                            "{\"operacao\":\"%s\",\"token\":\"%s\",\"id\":\"%d\"}",
+                            operacao, token, id
+                    );
+
+                    out.println(categoryJSON);
                     out.flush();
 
                     String serverResponse = in.readLine();
@@ -397,14 +434,23 @@ public class Client {
             if (userInput.equals("3")) {
 
                 operacao = "logout";
+                token = ra;
+
                 String userJSON = String.format(
-                        "{\"operacao\":\"%s\",\"ra\":\"%s\"}",
-                        operacao, ra
+                        "{\"operacao\":\"%s\",\"token\":\"%s\"}",
+                        operacao, token
                 );
 
                 out.println(userJSON);
+                out.flush();
 
-                break;
+                String serverResponse = in.readLine();
+                if (serverResponse != null) {
+                    System.out.println("Resposta do servidor: " + serverResponse);
+                    Menu.menu();
+                } else {
+                    System.out.println("Nenhuma resposta recebida do servidor.");
+                }
             }
         }
         try {

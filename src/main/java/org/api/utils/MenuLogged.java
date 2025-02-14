@@ -13,6 +13,7 @@ public class MenuLogged {
             System.out.println("Digite (\"8\" Cadastrar Categoria)");
             System.out.println("Digite (\"9\" Excluir Categoria)");
             System.out.println("Digite (\"10\" Listar Categorias)");
+            System.out.println("Digite (\"11\" Localizar Categoria)");
 
     }
 }

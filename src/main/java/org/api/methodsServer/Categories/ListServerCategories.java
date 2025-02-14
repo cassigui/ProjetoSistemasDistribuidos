@@ -38,4 +38,30 @@ public class ListServerCategories {
 
         return responseJson;
     }
+
+    public static String findCategory(int id) throws JsonProcessingException, SQLException {
+        CategoryDAO categoryDAO;
+        String responseJson;
+
+        try (Connection connection = DatabaseConnection.getConnection()) {
+            categoryDAO = new CategoryDAO(connection);
+
+            Category response = categoryDAO.getCategoryById(id);
+
+            if (response != null) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                responseJson = objectMapper.writeValueAsString(response);
+            } else {
+                responseJson = "categorynotfound";
+            }
+        } catch (SQLException e) {
+            System.err.println("Server: Erro ao conectar ao banco de dados: " + e.getMessage());
+            return "{\"error\":\"Erro ao conectar ao banco de dados.\"}";
+        } catch (JsonProcessingException e) {
+            System.err.println("Server: Erro ao processar JSON: " + e.getMessage());
+            return "{\"error\":\"Erro ao processar os dados.\"}";
+        }
+
+        return responseJson;
+    }
 }

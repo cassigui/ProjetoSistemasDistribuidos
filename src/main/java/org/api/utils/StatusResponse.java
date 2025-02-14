@@ -10,7 +10,7 @@ public class StatusResponse {
         return responseJSON;
     }
 
-    public static String status200Loggin() {
+    public static String status200Loggout() {
         String responseJSON = "";
         responseJSON = String.format(
                 "{\"status\":\"%d\"}",
@@ -42,15 +42,6 @@ public class StatusResponse {
         responseJSON = String.format(
                 "{\"status\":\"%d\",\"operacao\":\"%s\",\"mensagem\":\"%s\"}",
                 500, operacao, "Error interno, falha ao cadastrar a categoria"
-        );
-        return responseJSON;
-    }
-
-    public static String noData(String operacao) {
-        String responseJSON = "";
-        responseJSON = String.format(
-                "{\"status\":\"%d\",\"operacao\":\"%s\",\"mensagem\":\"%s\"}",
-                500, operacao, "Lista vazia"
         );
         return responseJSON;
     }
@@ -87,6 +78,15 @@ public class StatusResponse {
         responseJSON = String.format(
                 "{\"status\":\"%d\",\"operacao\":\"%s\",\"mensagem\":\"%s\"}",
                 401, operacao, "Acesso não autorizado."
+        );
+        return responseJSON;
+    }
+
+    public static String notFoundOperation(String operacao) {
+        String responseJSON = "";
+        responseJSON = String.format(
+                "{\"status\":\"%d\",\"operacao\":\"%s\",\"mensagem\":\"%s\"}",
+                401, operacao, "Operação desconhecida."
         );
         return responseJSON;
     }
@@ -137,6 +137,18 @@ public class StatusResponse {
                 responseJSON = String.format(
                         "{\"status\":\"%d\",\"operacao\":\"%s\",\"mensagem\":\"%s\"}",
                         401, operation, "O usuário não existe"
+                );
+                break;
+            case "categorynotfound":
+                responseJSON = String.format(
+                        "{\"status\":\"%d\",\"operacao\":\"%s\",\"mensagem\":\"%s\"}",
+                        401, operation, "A categoria não existe"
+                );
+                break;
+            case "nodata":
+                responseJSON = String.format(
+                        "{\"status\":\"%d\",\"operacao\":\"%s\",\"mensagem\":\"%s\"}",
+                        401, operation, "Vazio"
                 );
                 break;
             case "userexist":

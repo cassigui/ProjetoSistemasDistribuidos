@@ -9,9 +9,14 @@ public class Message {
     private int id;
     private Integer status;
     private User usuario;
+    private Category categoria;
 
     public User getUsuario() {
         return usuario;
+    }
+
+    public Category getCategoria() {
+        return categoria;
     }
 
     public Integer getStatus() {

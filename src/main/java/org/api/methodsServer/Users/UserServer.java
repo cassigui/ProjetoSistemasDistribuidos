@@ -23,7 +23,7 @@ public class UserServer {
                 ObjectMapper objectMapper = new ObjectMapper();
                 responseJson = objectMapper.writeValueAsString(response);
             } else {
-                responseJson = "noData";
+                responseJson = "usernotfound";
             }
         } catch (SQLException e) {
             System.err.println("Server: Erro ao conectar ao banco de dados: " + e.getMessage());
